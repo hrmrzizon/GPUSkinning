@@ -1,12 +1,10 @@
-Library
+Library/*
+.vs/*
+Temp/*
+obj/*
+UnityPackageManager/*
 
-obj
+*.userprefs
 
-Temp
-GPUSkinning_git.sln
-
-Assembly-CSharp.csproj
-GPUSkinning.csproj
-GPUSkinning.sln
-.vs/GPUSkinning/v14/.suo
-GPUSkinning.Editor.csproj
+*.csproj
+*.sln
