@@ -1,51 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Adam_Player_NPC : MonoBehaviour 
+﻿namespace chengkehan.GPUSkinning
 {
-	private GPUSkinningPlayer player = null;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-	private float actionTime = 0;
+    public class Adam_Player_NPC : MonoBehaviour
+    {
+        private GPUSkinningPlayer player = null;
 
-	private float time = 0;
+        private float actionTime = 0;
 
-	private void Start () 
-	{
-		player = GetComponent<GPUSkinningPlayerMono>().Player;
-		player.Play("Idle");
+        private float time = 0;
 
-		actionTime = Random.Range(5, 30);
-	}
+        private void Start()
+        {
+            player = GetComponent<GPUSkinningPlayerMono>().Player;
+            player.Play("Idle");
 
-	private void Update () 
-	{
-		time += Time.deltaTime;
-		if(time > actionTime)
-		{
-			time = 0;
-			float rnd = Random.value;
-			if(rnd < 0.25f)
-			{
-				player.CrossFade("TurnOnSpotLeftA", 0.2f);
-			}
-			else if(rnd < 0.5f)
-			{
-				player.CrossFade("TurnOnSpotRightA", 0.2f);
-			}
-			else if(rnd < 0.75f)
-			{
-				player.CrossFade("TurnOnSpotRightC", 0.2f);
-			}
-			else
-			{
-				player.CrossFade("TurnOnSpotLeftC", 0.2f);
-			}
-		}
+            actionTime = Random.Range(5, 30);
+        }
 
-		if(player.IsTimeAtTheEndOfLoop)
-		{
-			player.CrossFade("Idle", 0.8f);
-		}
-	}
+        private void Update()
+        {
+            time += Time.deltaTime;
+            if (time > actionTime)
+            {
+                time = 0;
+                float rnd = Random.value;
+                if (rnd < 0.25f)
+                {
+                    player.CrossFade("TurnOnSpotLeftA", 0.2f);
+                }
+                else if (rnd < 0.5f)
+                {
+                    player.CrossFade("TurnOnSpotRightA", 0.2f);
+                }
+                else if (rnd < 0.75f)
+                {
+                    player.CrossFade("TurnOnSpotRightC", 0.2f);
+                }
+                else
+                {
+                    player.CrossFade("TurnOnSpotLeftC", 0.2f);
+                }
+            }
+
+            if (player.IsTimeAtTheEndOfLoop)
+            {
+                player.CrossFade("Idle", 0.8f);
+            }
+        }
+    }
 }
