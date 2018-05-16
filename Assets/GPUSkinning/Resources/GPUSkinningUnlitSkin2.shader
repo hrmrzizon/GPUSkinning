@@ -7,7 +7,7 @@
 
 	CGINCLUDE
 	#include "UnityCG.cginc"
-	#include "Assets/GPUSkinning/Resources/GPUSkinningInclude.cginc"
+	#include "./GPUSkinningInclude.cginc"
 
 	struct appdata
 	{

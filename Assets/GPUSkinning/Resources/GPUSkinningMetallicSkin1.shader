@@ -89,8 +89,8 @@ ENDCG
 		#pragma multi_compile_instancing
 		#pragma multi_compile ROOTON_BLENDOFF ROOTON_BLENDON_CROSSFADEROOTON ROOTON_BLENDON_CROSSFADEROOTOFF ROOTOFF_BLENDOFF ROOTOFF_BLENDON_CROSSFADEROOTON ROOTOFF_BLENDON_CROSSFADEROOTOFF
 
-        #include "Assets/GPUSkinning/Resources/GPUSkinningSurface.cginc"
-		#include "Assets/GPUSkinning/Resources/GPUSkinningInclude.cginc"
+        #include "./GPUSkinningSurface.cginc"
+		#include "./GPUSkinningInclude.cginc"
 
         void myvert (inout appdata_vert v, out Input o) 
         {
