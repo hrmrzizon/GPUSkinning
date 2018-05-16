@@ -1,28 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class GPUSkinningExecuteOncePerFrame
+﻿namespace chengkehan.GPUSkinning
 {
-    private int frameCount = -1;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    public bool CanBeExecute()
+    public class GPUSkinningExecuteOncePerFrame
     {
-        if (Application.isPlaying)
-        {
-            return frameCount != Time.frameCount;
-        }
-        else
-        {
-            return true;
-        }
-    }
+        private int frameCount = -1;
 
-    public void MarkAsExecuted()
-    {
-        if (Application.isPlaying)
+        public bool CanBeExecute()
         {
-            frameCount = Time.frameCount;
+            if (Application.isPlaying)
+            {
+                return frameCount != Time.frameCount;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void MarkAsExecuted()
+        {
+            if (Application.isPlaying)
+            {
+                frameCount = Time.frameCount;
+            }
         }
     }
 }

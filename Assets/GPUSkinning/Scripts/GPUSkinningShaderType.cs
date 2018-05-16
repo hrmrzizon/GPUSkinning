@@ -1,9 +1,12 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public enum GPUSkinningShaderType
+﻿namespace chengkehan.GPUSkinning
 {
-	Unlit, 
-	StandardSpecular, 
-	StandardMetallic
+    using UnityEngine;
+    using System.Collections;
+
+    public enum GPUSkinningShaderType
+    {
+        Unlit,
+        StandardSpecular,
+        StandardMetallic
+    }
 }

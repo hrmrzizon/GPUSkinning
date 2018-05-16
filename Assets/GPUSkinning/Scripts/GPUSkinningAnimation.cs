@@ -1,27 +1,30 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class GPUSkinningAnimation : ScriptableObject
+﻿namespace chengkehan.GPUSkinning
 {
-    public string guid = null;
+    using UnityEngine;
+    using System.Collections;
 
-    public string name = null;
+    public class GPUSkinningAnimation : ScriptableObject
+    {
+        public string guid = null;
 
-    public GPUSkinningBone[] bones = null;
+        public string name = null;
 
-    public int rootBoneIndex = 0;
+        public GPUSkinningBone[] bones = null;
 
-    public GPUSkinningClip[] clips = null;
+        public int rootBoneIndex = 0;
 
-    public Bounds bounds;
+        public GPUSkinningClip[] clips = null;
 
-    public int textureWidth = 0;
+        public Bounds bounds;
 
-    public int textureHeight = 0;
+        public int textureWidth = 0;
 
-    public float[] lodDistances = null;
+        public int textureHeight = 0;
 
-    public Mesh[] lodMeshes = null;
+        public float[] lodDistances = null;
 
-    public float sphereRadius = 1.0f;
+        public Mesh[] lodMeshes = null;
+
+        public float sphereRadius = 1.0f;
+    }
 }

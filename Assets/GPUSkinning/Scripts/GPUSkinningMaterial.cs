@@ -1,19 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class GPUSkinningMaterial
+﻿namespace chengkehan.GPUSkinning
 {
-    public Material material = null;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    public GPUSkinningExecuteOncePerFrame executeOncePerFrame = new GPUSkinningExecuteOncePerFrame();
-
-    public void Destroy()
+    public class GPUSkinningMaterial
     {
-        if(material != null)
+        public Material material = null;
+
+        public GPUSkinningExecuteOncePerFrame executeOncePerFrame = new GPUSkinningExecuteOncePerFrame();
+
+        public void Destroy()
         {
-            Object.Destroy(material);
-            material = null;
+            if (material != null)
+            {
+                Object.Destroy(material);
+                material = null;
+            }
         }
     }
 }

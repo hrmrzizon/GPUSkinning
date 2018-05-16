@@ -1,24 +1,27 @@
-﻿using UnityEngine;
-using System.Collections;
-
-[System.Serializable]
-public class GPUSkinningClip
+﻿namespace chengkehan.GPUSkinning
 {
-    public string name = null;
+    using UnityEngine;
+    using System.Collections;
 
-    public float length = 0.0f;
+    [System.Serializable]
+    public class GPUSkinningClip
+    {
+        public string name = null;
 
-    public int fps = 0;
+        public float length = 0.0f;
 
-    public GPUSkinningWrapMode wrapMode = GPUSkinningWrapMode.Once;
+        public int fps = 0;
 
-    public GPUSkinningFrame[] frames = null;
+        public GPUSkinningWrapMode wrapMode = GPUSkinningWrapMode.Once;
 
-    public int pixelSegmentation = 0;
+        public GPUSkinningFrame[] frames = null;
 
-    public bool rootMotionEnabled = false;
+        public int pixelSegmentation = 0;
 
-    public bool individualDifferenceEnabled = false;
+        public bool rootMotionEnabled = false;
 
-    public GPUSkinningAnimEvent[] events = null;
+        public bool individualDifferenceEnabled = false;
+
+        public GPUSkinningAnimEvent[] events = null;
+    }
 }

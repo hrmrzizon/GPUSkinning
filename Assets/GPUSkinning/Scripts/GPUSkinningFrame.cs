@@ -1,28 +1,31 @@
-﻿using UnityEngine;
-using System.Collections;
-
-[System.Serializable]
-public class GPUSkinningFrame
+﻿namespace chengkehan.GPUSkinning
 {
-    public Matrix4x4[] matrices = null;
+    using UnityEngine;
+    using System.Collections;
 
-    public Quaternion rootMotionDeltaPositionQ;
-
-    public float rootMotionDeltaPositionL;
-
-    public Quaternion rootMotionDeltaRotation;
-
-    [System.NonSerialized]
-    private bool rootMotionInvInit = false;
-    [System.NonSerialized]
-    private Matrix4x4 rootMotionInv;
-    public Matrix4x4 RootMotionInv(int rootBoneIndex)
+    [System.Serializable]
+    public class GPUSkinningFrame
     {
-        if (!rootMotionInvInit)
+        public Matrix4x4[] matrices = null;
+
+        public Quaternion rootMotionDeltaPositionQ;
+
+        public float rootMotionDeltaPositionL;
+
+        public Quaternion rootMotionDeltaRotation;
+
+        [System.NonSerialized]
+        private bool rootMotionInvInit = false;
+        [System.NonSerialized]
+        private Matrix4x4 rootMotionInv;
+        public Matrix4x4 RootMotionInv(int rootBoneIndex)
         {
-            rootMotionInv = matrices[rootBoneIndex].inverse;
-            rootMotionInvInit = true;
+            if (!rootMotionInvInit)
+            {
+                rootMotionInv = matrices[rootBoneIndex].inverse;
+                rootMotionInvInit = true;
+            }
+            return rootMotionInv;
         }
-        return rootMotionInv;
     }
 }

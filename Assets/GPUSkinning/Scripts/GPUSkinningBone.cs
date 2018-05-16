@@ -1,41 +1,44 @@
-﻿using UnityEngine;
-using System.Collections;
-
-[System.Serializable]
-public class GPUSkinningBone
+﻿namespace chengkehan.GPUSkinning
 {
-	[System.NonSerialized]
-	public Transform transform = null;
+    using UnityEngine;
+    using System.Collections;
 
-	public Matrix4x4 bindpose;
-
-	public int parentBoneIndex = -1;
-
-	public int[] childrenBonesIndices = null;
-
-	[System.NonSerialized]
-	public Matrix4x4 animationMatrix;
-
-	public string name = null;
-
-    public string guid = null; 
-
-    public bool isExposed = false;
-
-    [System.NonSerialized]
-    private bool bindposeInvInit = false;
-    [System.NonSerialized]
-    private Matrix4x4 bindposeInv;
-    public Matrix4x4 BindposeInv
+    [System.Serializable]
+    public class GPUSkinningBone
     {
-        get
+        [System.NonSerialized]
+        public Transform transform = null;
+
+        public Matrix4x4 bindpose;
+
+        public int parentBoneIndex = -1;
+
+        public int[] childrenBonesIndices = null;
+
+        [System.NonSerialized]
+        public Matrix4x4 animationMatrix;
+
+        public string name = null;
+
+        public string guid = null;
+
+        public bool isExposed = false;
+
+        [System.NonSerialized]
+        private bool bindposeInvInit = false;
+        [System.NonSerialized]
+        private Matrix4x4 bindposeInv;
+        public Matrix4x4 BindposeInv
         {
-            if(!bindposeInvInit)
+            get
             {
-                bindposeInv = bindpose.inverse;
-                bindposeInvInit = true;
+                if (!bindposeInvInit)
+                {
+                    bindposeInv = bindpose.inverse;
+                    bindposeInvInit = true;
+                }
+                return bindposeInv;
             }
-            return bindposeInv;
         }
     }
 }

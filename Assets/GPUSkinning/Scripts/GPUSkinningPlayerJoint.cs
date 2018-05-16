@@ -1,53 +1,56 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-[ExecuteInEditMode]
-public class GPUSkinningPlayerJoint : MonoBehaviour
+﻿namespace chengkehan.GPUSkinning
 {
-    [HideInInspector]
-    [SerializeField]
-    private int boneIndex = 0;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    [HideInInspector]
-    [SerializeField]
-    private string boneGUID = null;
-
-    private Transform bone = null;
-
-    public int BoneIndex
+    [ExecuteInEditMode]
+    public class GPUSkinningPlayerJoint : MonoBehaviour
     {
-        get
+        [HideInInspector]
+        [SerializeField]
+        private int boneIndex = 0;
+
+        [HideInInspector]
+        [SerializeField]
+        private string boneGUID = null;
+
+        private Transform bone = null;
+
+        public int BoneIndex
         {
-            return boneIndex;
+            get
+            {
+                return boneIndex;
+            }
         }
-    }
 
-    public string BoneGUID
-    {
-        get
+        public string BoneGUID
         {
-            return boneGUID;
+            get
+            {
+                return boneGUID;
+            }
         }
-    }
 
-    public Transform Transform
-    {
-        get
+        public Transform Transform
         {
-            return bone;
+            get
+            {
+                return bone;
+            }
         }
-    }
 
-    private void Awake()
-    {
-        hideFlags = HideFlags.HideInInspector;
-        this.bone = transform;
-    }
+        private void Awake()
+        {
+            hideFlags = HideFlags.HideInInspector;
+            this.bone = transform;
+        }
 
-    public void Init(int boneIndex, string boneGUID)
-    {
-        this.boneIndex = boneIndex;
-        this.boneGUID = boneGUID;
+        public void Init(int boneIndex, string boneGUID)
+        {
+            this.boneIndex = boneIndex;
+            this.boneGUID = boneGUID;
+        }
     }
 }
