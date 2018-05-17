@@ -86,10 +86,16 @@
             OnGUI_Preview(sampler);
 
             if (preview != null)
-            {
                 Repaint();
-            }
         }
+
+        private GUIContent emptyGUIContent = new GUIContent();
+
+        private GUIContent animationNameContent = new GUIContent("Animation Name");
+        private GUIContent qualityContent = new GUIContent("Quality");
+        private GUIContent shaderTypeContent = new GUIContent("Shader Type");
+        private GUIContent rootBoneContent = new GUIContent("Root Bone");
+        private GUIContent newShaderContent = new GUIContent("New Shader");
 
         private void OnGUI_Sampler(GPUSkinningSampler sampler)
         {
@@ -98,6 +104,7 @@
             BeginBox();
             {
                 GUI.enabled = guiEnabled;
+                if (guiEnabled)
                 {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("animName"), new GUIContent("Animation Name"));
 
@@ -106,43 +113,43 @@
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("anim"), new GUIContent());
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("anim"), emptyGUIContent);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedMesh"), new GUIContent());
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedMesh"), emptyGUIContent);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedMtrl"), new GUIContent());
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedMtrl"), emptyGUIContent);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedShader"), new GUIContent());
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedShader"), emptyGUIContent);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("texture"), new GUIContent());
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("texture"), emptyGUIContent);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.Space();
                     GUI.enabled = true && guiEnabled;
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("skinQuality"), new GUIContent("Quality"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("skinQuality"), qualityContent);
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("shaderType"), new GUIContent("Shader Type"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("shaderType"), shaderTypeContent);
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("rootBoneTransform"), new GUIContent("Root Bone"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("rootBoneTransform"), rootBoneContent);
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("createNewShader"), new GUIContent("New Shader"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("createNewShader"), newShaderContent);
 
                     OnGUI_AnimClips(sampler);
 
@@ -166,6 +173,8 @@
                         }
                         else
                         {
+                            progressUpdateFrameCount = int.MinValue;
+
                             DestroyPreview();
                             LockInspector(true);
                             sampler.BeginSample();
@@ -333,17 +342,17 @@
                                     }
                                     if (j == 0)
                                     {
-                                        EditorGUILayout.PropertyField(prop3, new GUIContent());
+                                        EditorGUILayout.PropertyField(prop3, emptyGUIContent);
                                         prop3.intValue = Mathf.Clamp(prop3.intValue, 0, 60);
                                     }
                                     if (j == 1)
                                     {
-                                        EditorGUILayout.PropertyField(prop2, new GUIContent());
+                                        EditorGUILayout.PropertyField(prop2, emptyGUIContent);
                                     }
                                     if (j == 2)
                                     {
                                         GUI.enabled = sampler.IsAnimatorOrAnimation() && guiEnabled;
-                                        EditorGUILayout.PropertyField(prop, new GUIContent());
+                                        EditorGUILayout.PropertyField(prop, emptyGUIContent);
                                         GUI.enabled = true && guiEnabled;
                                     }
                                     if (j == 3)
@@ -579,6 +588,9 @@
         private bool animEvent_dragging = false;
         private int animEvent_dragging_index = -1;
         private int animEvent_edit_index = -1;
+
+        private List<GPUSkinningAnimEvent> animEventBufferList = new List<GPUSkinningAnimEvent>();
+
         private void OnGUI_AnimEvents(Rect rect)
         {
             rect.y += 30;
@@ -630,9 +642,10 @@
                     {
                         if (e.control)
                         {
-                            List<GPUSkinningAnimEvent> newEvents = new List<GPUSkinningAnimEvent>(clip.events);
-                            newEvents.RemoveAt(i);
-                            clip.events = newEvents.ToArray();
+                            animEventBufferList.Clear();
+                            animEventBufferList.AddRange(clip.events);
+                            animEventBufferList.RemoveAt(i);
+                            clip.events = animEventBufferList.ToArray();
                             ApplyAnimModification();
                             --i;
                             OnGUI_AnimTimeline_PlayerUpdate();
@@ -653,16 +666,15 @@
             {
                 if (e.type == EventType.MouseDown && !e.control && !animEvent_dragging)
                 {
-                    List<GPUSkinningAnimEvent> newEvents = new List<GPUSkinningAnimEvent>();
                     if (clip.events != null)
                     {
-                        newEvents.AddRange(clip.events);
+                        animEventBufferList.AddRange(clip.events);
                     }
                     GPUSkinningAnimEvent newEvent = new GPUSkinningAnimEvent();
-                    newEvents.Add(newEvent);
+                    animEventBufferList.Add(newEvent);
                     float normalizedTime = OnGUI_AnimTimeline_MouseDown_NormalizedTime(mousePos, rect);
                     newEvent.frameIndex = GPUSkinningUtil.NormalizeTimeToFrameIndex(clip, normalizedTime);
-                    clip.events = newEvents.ToArray();
+                    clip.events = animEventBufferList.ToArray();
                     ApplyAnimModification();
                     OnGUI_AnimTimeline_PlayerUpdate();
                 }
@@ -684,11 +696,13 @@
             }
         }
 
+        private GUIContent eventIDContent = new GUIContent("EventId:");
+
         private void OnGUI_AnimEvents_Edit(Rect bgRect, GPUSkinningAnimEvent evt)
         {
             Rect rect = bgRect;
             rect.y += 30;
-            EditorGUI.PrefixLabel(rect, new GUIContent("EventId:"));
+            EditorGUI.PrefixLabel(rect, eventIDContent);
             rect.x += 80;
             rect.width -= 80;
             EditorGUI.BeginChangeCheck();
@@ -735,18 +749,19 @@
             return rectThumb;
         }
 
+        private List<GPUSkinningClip> rootMotionClipBufferList = new List<GPUSkinningClip>();
+
         private void OnGUI_RootMotion()
         {
-            List<GPUSkinningClip> rootMotionClips = new List<GPUSkinningClip>();
             for (int i = 0; i < anim.clips.Length; ++i)
             {
                 if (anim.clips[i].rootMotionEnabled)
                 {
-                    rootMotionClips.Add(anim.clips[i]);
+                    rootMotionClipBufferList.Add(anim.clips[i]);
                 }
             }
 
-            if (rootMotionClips.Count > 0)
+            if (rootMotionClipBufferList.Count > 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 {
@@ -787,6 +802,8 @@
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
+            rootMotionClipBufferList.Clear();
         }
 
         private void OnGUI_RootMotion_BakeIntoPose_Label(string label)
@@ -947,6 +964,38 @@
             EndBox();
         }
 
+        private static Dictionary<int, string> lodMeshDataNameDict = new Dictionary<int, string>();
+        private static Dictionary<int, string> lodDistanceDataNameDict = new Dictionary<int, string>();
+        private static Dictionary<int, GUIContent> LODNameDict = new Dictionary<int, GUIContent>();
+
+        private static string GetlodMeshDataName(int index)
+        {
+            if (!lodMeshDataNameDict.ContainsKey(index))
+                lodMeshDataNameDict.Add(index, string.Format("lodMeshes.Array.data[{0}]", index));
+            else if (lodMeshDataNameDict[index] == null)
+                lodMeshDataNameDict[index] = string.Format("lodMeshes.Array.data[{0}]", index);
+
+            return lodMeshDataNameDict[index];
+        }
+        private static string GetlodDistanceDataName(int index)
+        {
+            if (!lodDistanceDataNameDict.ContainsKey(index))
+                lodDistanceDataNameDict.Add(index, string.Format("lodDistances.Array.data[{0}]", index));
+            else if (lodDistanceDataNameDict[index] == null)
+                lodDistanceDataNameDict[index] = string.Format("lodDistances.Array.data[{0}]", index);
+
+            return lodDistanceDataNameDict[index];
+        }
+        private static GUIContent GetLODContent(int index)
+        {
+            if (!LODNameDict.ContainsKey(index))
+                LODNameDict.Add(index, new GUIContent(string.Format("LOD{0}", index)));
+            else if (LODNameDict[index] == null)
+                LODNameDict[index] = new GUIContent(string.Format("LOD{0}", index));
+
+            return LODNameDict[index];
+        }
+
         private void OnGUI_LODMeshes(GPUSkinningSampler sampler)
         {
             SerializedProperty sizeSP = serializedObject.FindProperty("lodMeshes.Array.size");
@@ -969,14 +1018,14 @@
                     EditorGUILayout.BeginHorizontal();
                     {
                         EditorGUI.BeginChangeCheck();
-                        EditorGUILayout.ObjectField(serializedObject.FindProperty("lodMeshes.Array.data[" + i + "]"), new GUIContent("LOD" + (i + 1)));
+                        EditorGUILayout.ObjectField(serializedObject.FindProperty(GetlodMeshDataName(i)), GetLODContent(i + 1));
                         if (EditorGUI.EndChangeCheck())
                         {
                             ApplySamplerModification(sampler);
                         }
 
                         EditorGUI.BeginChangeCheck();
-                        SerializedProperty distSP = serializedObject.FindProperty("lodDistances.Array.data[" + i + "]");
+                        SerializedProperty distSP = serializedObject.FindProperty(GetlodDistanceDataName(i));
                         distSP.floatValue = EditorGUILayout.FloatField(distSP.floatValue, GUILayout.Width(80));
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -1392,6 +1441,9 @@
             }
         }
 
+        private const int progressUpdateCount = 20;
+        private int progressUpdateFrameCount;
+
         private void UpdateHandler()
         {
             if (preview != null && EditorApplication.isPlaying)
@@ -1430,6 +1482,7 @@
             {
                 if (++sampler.samplingClipIndex < sampler.animClips.Length)
                 {
+                    progressUpdateFrameCount = int.MinValue;
                     sampler.StartSample();
                 }
                 else
@@ -1443,8 +1496,13 @@
 
             if (sampler.isSampling)
             {
-                string msg = sampler.animClip.name + "(" + (sampler.samplingClipIndex + 1) + "/" + sampler.animClips.Length + ")";
-                EditorUtility.DisplayProgressBar("Sampling, DONOT stop playing", msg, (float)(sampler.samplingFrameIndex + 1) / sampler.samplingTotalFrams);
+                if (progressUpdateFrameCount + sampler.samplingTotalFrams / progressUpdateCount <= sampler.samplingFrameIndex + 1)
+                {
+                    string msg = string.Format("{0}({1}/{2})", sampler.animClip.name, (sampler.samplingClipIndex + 1), sampler.animClips.Length);
+                    EditorUtility.DisplayProgressBar(string.Format("Sampling, DONOT stop playing({0}/{1})", sampler.samplingFrameIndex, sampler.samplingTotalFrams), msg, (float)(sampler.samplingFrameIndex + 1) / sampler.samplingTotalFrams);
+
+                    progressUpdateFrameCount = sampler.samplingFrameIndex + 1;
+                }
             }
         }
 
