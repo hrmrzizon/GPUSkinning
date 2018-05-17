@@ -208,6 +208,7 @@
                 return;
             }
 
+
             samplingFrameIndex = 0;
 
             gpuSkinningAnimation = anim == null ? ScriptableObject.CreateInstance<GPUSkinningAnimation>() : anim;
@@ -392,8 +393,6 @@
 
         private Mesh CreateNewMesh(Mesh mesh, string meshName)
         {
-            Debug.Log(meshName);
-
             Vector3[] normals = mesh.normals;
             Vector4[] tangents = mesh.tangents;
             Color[] colors = mesh.colors;
