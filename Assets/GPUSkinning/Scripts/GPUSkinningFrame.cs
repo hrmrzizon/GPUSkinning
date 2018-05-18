@@ -65,5 +65,34 @@
 
             return matrices.Length * matrixSize;
         }
+
+        public int SetMatrixFromTexture(Color[] matrixColors, int accumColorIndex, int totalBoneCount)
+        {
+            int stepSize = 3; // Matrix composed three Vector4
+            
+            if (matrices == null) matrices = new Matrix4x4[totalBoneCount];
+            else Array.Resize(ref matrices, totalBoneCount);
+
+            Color color0, color1, color2;
+
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                int colorIndex = accumColorIndex + i * stepSize;
+
+                color0 = matrixColors[colorIndex + 0];
+                color1 = matrixColors[colorIndex + 1];
+                color2 = matrixColors[colorIndex + 2];
+
+                matrices[i] =
+                    new Matrix4x4(
+                        new Vector4(color0.r, color1.r, color2.r, 0),
+                        new Vector4(color0.g, color1.g, color2.g, 0),
+                        new Vector4(color0.b, color1.b, color2.b, 0),
+                        new Vector4(color0.a, color1.a, color2.a, 1)
+                        );
+            }
+
+            return matrices.Length * stepSize;
+        }
     }
 }

@@ -36,5 +36,18 @@
 
             return caculateIndexOffset;
         }
+
+        public int SetMatrixFromTexture(Color[] matrixColors, int accumByteIndex, int totalBoneCount)
+        {
+            int caculateIndexOffset = 0;
+
+            for (int i = 0; i < frames.Length; i++)
+            {
+                GPUSkinningFrame frame = frames[i];
+                caculateIndexOffset += frame.SetMatrixFromTexture(matrixColors, accumByteIndex + caculateIndexOffset, totalBoneCount);
+            }
+
+            return caculateIndexOffset;
+        }
     }
 }

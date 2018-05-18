@@ -30,15 +30,25 @@
         public TextAsset vertexMatrixPerClipBytes;
 
         [ContextMenu("Set Matrices from TextAsset.bytes")]
-        public void SetMatricesFromTextAsset()
+        public void SetMatrixFromTextAsset()
         {
             byte[] bytes = vertexMatrixPerClipBytes.bytes;
             int caculateIndexOffset = 0;
-
-            Debug.Log(bytes.Length);
-
+            
             for (int i = 0; i < clips.Length; i++)
                 caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
+        }
+
+        public Texture2D vertexMatrixTexturePerClipBytes;
+
+        [ContextMenu("Set Matrices from Texture2D.GetPixels")]
+        public void SetMatrixFromTexture()
+        {
+            Color[] colors = vertexMatrixTexturePerClipBytes.GetPixels(); 
+            int caculateIndexOffset = 0;
+
+            for (int i = 0; i < clips.Length; i++)
+                caculateIndexOffset += clips[i].SetMatrixFromTexture(colors, caculateIndexOffset, bones.Length);
         }
     }
 }
