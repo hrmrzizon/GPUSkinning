@@ -26,5 +26,19 @@
         public Mesh[] lodMeshes = null;
 
         public float sphereRadius = 1.0f;
+
+        public TextAsset vertexMatrixPerClipBytes;
+
+        [ContextMenu("Set Matrices from TextAsset.bytes")]
+        public void SetMatricesFromTextAsset()
+        {
+            byte[] bytes = vertexMatrixPerClipBytes.bytes;
+            int caculateIndexOffset = 0;
+
+            Debug.Log(bytes.Length);
+
+            for (int i = 0; i < clips.Length; i++)
+                caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
+        }
     }
 }
