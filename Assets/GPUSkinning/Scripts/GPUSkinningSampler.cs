@@ -122,6 +122,10 @@
 
         [HideInInspector]
         [System.NonSerialized]
+        public int acculSamplingTotalFrams = 0;
+
+        [HideInInspector]
+        [System.NonSerialized]
         public int samplingFrameIndex = 0;
 
         public const string TEMP_SAVED_ANIM_PATH = "GPUSkinning_Temp_Save_Anim_Path";
@@ -129,15 +133,20 @@
         public const string TEMP_SAVED_MESH_PATH = "GPUSkinning_Temp_Save_Mesh_Path";
         public const string TEMP_SAVED_SHADER_PATH = "GPUSkinning_Temp_Save_Shader_Path";
         public const string TEMP_SAVED_TEXTURE_PATH = "GPUSkinning_Temp_Save_Texture_Path";
+        public const string TEMP_SAVED_TEXTURE2_PATH = "GPUSkinning_Temp_Save_Texture2_Path";
 
         public void BeginSample()
         {
             samplingClipIndex = 0;
+            acculSamplingTotalFrams = 0;
+            Debug.Log("BeginSample");
         }
 
         public void EndSample()
         {
             samplingClipIndex = -1;
+            acculSamplingTotalFrams = 0;
+            Debug.Log("EndSample");
         }
 
         public bool IsSamplingProgress()
@@ -247,6 +256,9 @@
             gpuSkinningClip.rootMotionEnabled = rootMotionEnabled[samplingClipIndex];
             gpuSkinningClip.individualDifferenceEnabled = individualDifferenceEnabled[samplingClipIndex];
 
+            gpuSkinningClip.matrixCount = numFrames * bones_result.Count;
+            gpuSkinningClip.matrixStartIndex = acculSamplingTotalFrams * bones_result.Count;
+            
             if (gpuSkinningAnimation.clips == null)
             {
                 gpuSkinningAnimation.clips = new GPUSkinningClip[] { gpuSkinningClip };
@@ -533,7 +545,7 @@
             texture.SetPixels(pixels);
             texture.Apply();
 
-            string savedPath = dir + "/GPUSKinning_Texture_" + animName + ".bytes";
+            string savedPath = string.Format("{0}/GPUSKinning_Texture_{1}.bytes", dir, animName);
             using (FileStream fileStream = new FileStream(savedPath, FileMode.Create))
             {
                 byte[] bytes = texture.GetRawTextureData();
@@ -677,6 +689,9 @@
 
             if (samplingFrameIndex >= totalFrams)
             {
+                acculSamplingTotalFrams += totalFrams;
+                Debug.Log(acculSamplingTotalFrams);
+
                 if (animator != null)
                 {
                     animator.StopPlayback();

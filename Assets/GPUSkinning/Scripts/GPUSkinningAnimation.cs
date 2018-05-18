@@ -27,28 +27,59 @@
 
         public float sphereRadius = 1.0f;
 
-        public TextAsset vertexMatrixPerClipBytes;
+        public TextAsset matrixTextAsset;
 
         [ContextMenu("Set Matrices from TextAsset.bytes")]
         public void SetMatrixFromTextAsset()
         {
-            byte[] bytes = vertexMatrixPerClipBytes.bytes;
+            byte[] bytes = matrixTextAsset.bytes;
             int caculateIndexOffset = 0;
             
             for (int i = 0; i < clips.Length; i++)
                 caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
         }
 
-        public Texture2D vertexMatrixTexturePerClipBytes;
+        public Texture2D matrixTexture;
 
         [ContextMenu("Set Matrices from Texture2D.GetPixels")]
         public void SetMatrixFromTexture()
         {
-            Color[] colors = vertexMatrixTexturePerClipBytes.GetPixels(); 
+            Color[] colors = matrixTexture.GetPixels(); 
             int caculateIndexOffset = 0;
 
             for (int i = 0; i < clips.Length; i++)
                 caculateIndexOffset += clips[i].SetMatrixFromTexture(colors, caculateIndexOffset, bones.Length);
+        }
+
+        private Color[] colorsForMatrix = null;
+
+        public void LoadMatrixAsPixel()
+        {
+            colorsForMatrix = matrixTexture.GetPixels();
+        }
+
+        public Matrix4x4 GetMatrixInTexture(int clipIndex, int frameIndex, int boneIndex)
+        {
+            if (colorsForMatrix == null)
+                return
+                    GPUSkinningUtil.GetMatrixFromTexture(
+                        matrixTexture,
+                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length,
+                        boneIndex
+                        );
+            else
+                return 
+                    GPUSkinningUtil.GetMatrixFromTexture(
+                        colorsForMatrix,
+                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length,
+                        boneIndex
+                        );
+        }
+
+        [ContextMenu("Check Get MAtrix")]
+        public void DD()
+        {
+            Debug.Log(GetMatrixInTexture(1, 0, 0));
         }
     }
 }

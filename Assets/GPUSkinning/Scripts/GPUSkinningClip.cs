@@ -24,6 +24,9 @@
 
         public GPUSkinningAnimEvent[] events = null;
 
+        public int matrixStartIndex;
+        public int matrixCount;
+        
         public int SetMatrixFromTexture(byte[] matrixBytes, int accumByteIndex, int totalBoneCount)
         {
             int caculateIndexOffset = 0;
@@ -36,7 +39,7 @@
 
             return caculateIndexOffset;
         }
-
+        
         public int SetMatrixFromTexture(Color[] matrixColors, int accumByteIndex, int totalBoneCount)
         {
             int caculateIndexOffset = 0;
