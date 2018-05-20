@@ -7,6 +7,7 @@
     [System.Serializable]
     public class GPUSkinningFrame
     {
+        [System.NonSerialized]
         public Matrix4x4[] matrices = null;
 
         public Quaternion rootMotionDeltaPositionQ;
@@ -23,10 +24,40 @@
         {
             if (!rootMotionInvInit)
             {
-                rootMotionInv = matrices[rootBoneIndex].inverse;
-                rootMotionInvInit = true;
+                if (matrices == null)
+                {
+                    rootMotionInv = GetMatrixInTexture(rootBoneIndex).inverse;
+                    rootMotionInvInit = true;
+                }
+                else
+                {
+                    rootMotionInv = matrices[rootBoneIndex].inverse;
+                    rootMotionInvInit = true;
+                }
             }
             return rootMotionInv;
+        }
+
+        [System.NonSerialized]
+        public Texture2D matrixTexture;
+        [System.NonSerialized]
+        public Color[] colorsForMatrix = null;
+        [System.NonSerialized]
+        public int matrixStartIndex;
+
+        public void SetTextureForMatrix(Texture2D texture, Color[] colors, int matrixStartIndex)
+        {
+            matrixTexture = texture;
+            colorsForMatrix = colors;
+            this.matrixStartIndex = matrixStartIndex;
+        }
+
+        public Matrix4x4 GetMatrixInTexture(int boneIndex)
+        {
+            if (colorsForMatrix == null)
+                return GPUSkinningUtil.GetMatrixFromTexture(matrixTexture, matrixStartIndex + boneIndex);
+            else
+                return GPUSkinningUtil.GetMatrixFromTexture(colorsForMatrix, matrixStartIndex + boneIndex);
         }
 
         public int SetMatrixFromTexture(byte[] matrixBytes, int accumByteIndex, int totalBoneCount)
@@ -49,7 +80,6 @@
 
             return matrices.Length * GPUSkinningUtil.matrixByteSize;
         }
-
         public int SetMatrixFromTexture(Color[] matrixColors, int accumColorIndex, int totalBoneCount)
         {           
             if (matrices == null) matrices = new Matrix4x4[totalBoneCount];

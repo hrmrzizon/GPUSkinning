@@ -25,6 +25,10 @@
 
         [HideInInspector]
         [SerializeField]
+        private Texture2D textureData = null;
+
+        [HideInInspector]
+        [SerializeField]
         private int defaultPlayingClipIndex = 0;
 
         [HideInInspector]
@@ -93,7 +97,10 @@
                     res.anim = anim;
                     res.mesh = mesh;
                     res.InitMaterial(mtrl, HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor);
-                    res.texture = GPUSkinningTexturePool.GetTextureOrAdd(textureRawData.name, () => GPUSkinningUtil.CreateTexture2D(textureRawData, anim));
+                    res.texture =
+                        textureData != null ?
+                        textureData :
+                        GPUSkinningTexturePool.GetTextureOrAdd(textureRawData.name, () => GPUSkinningUtil.CreateTexture2D(textureRawData, anim));
                     res.texture.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
                 }
 

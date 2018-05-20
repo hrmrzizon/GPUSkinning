@@ -591,7 +591,6 @@
                 return;
             }
 
-            Matrix4x4[] matrices = frame.matrices;
             GPUSkinningBone[] bones = res.anim.bones;
             int numJoints = joints.Count;
             for (int i = 0; i < numJoints; ++i)
@@ -602,7 +601,13 @@
                 {
                     // TODO: Update Joint when Animation Blend
 
-                    Matrix4x4 jointMatrix = frame.matrices[joint.BoneIndex] * bones[joint.BoneIndex].BindposeInv;
+                    Matrix4x4 jointMatrix = 
+                        /*/
+                        frame.matrices[joint.BoneIndex] * 
+                        /*/
+                        frame.GetMatrixInTexture(joint.BoneIndex) *
+                        //*/
+                        bones[joint.BoneIndex].BindposeInv;
                     if (playingClip.rootMotionEnabled && rootMotionEnabled)
                     {
                         jointMatrix = frame.RootMotionInv(res.anim.rootBoneIndex) * jointMatrix;

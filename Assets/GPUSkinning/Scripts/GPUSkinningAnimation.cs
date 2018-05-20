@@ -2,7 +2,9 @@
 {
     using UnityEngine;
     using System.Collections;
+    using System;
 
+    [ExecuteInEditMode]
     public class GPUSkinningAnimation : ScriptableObject
     {
         public string guid = null;
@@ -28,35 +30,11 @@
         public float sphereRadius = 1.0f;
 
         public TextAsset matrixTextAsset;
-
-        [ContextMenu("Set Matrices from TextAsset.bytes")]
-        public void SetMatrixFromTextAsset()
-        {
-            byte[] bytes = matrixTextAsset.bytes;
-            int caculateIndexOffset = 0;
-            
-            for (int i = 0; i < clips.Length; i++)
-                caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
-        }
-
         public Texture2D matrixTexture;
+        [System.NonSerialized]
+        public Color[] colorsForMatrix = null;
 
-        [ContextMenu("Set Matrices from Texture2D.GetPixels")]
-        public void SetMatrixFromTexture()
-        {
-            Color[] colors = matrixTexture.GetPixels(); 
-            int caculateIndexOffset = 0;
-
-            for (int i = 0; i < clips.Length; i++)
-                caculateIndexOffset += clips[i].SetMatrixFromTexture(colors, caculateIndexOffset, bones.Length);
-        }
-
-        private Color[] colorsForMatrix = null;
-
-        public void LoadMatrixAsPixel()
-        {
-            colorsForMatrix = matrixTexture.GetPixels();
-        }
+        public void LoadMatrixAsPixel() { colorsForMatrix = matrixTexture.GetPixels(); }
 
         public Matrix4x4 GetMatrixInTexture(int clipIndex, int frameIndex, int boneIndex)
         {
@@ -64,22 +42,39 @@
                 return
                     GPUSkinningUtil.GetMatrixFromTexture(
                         matrixTexture,
-                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length,
-                        boneIndex
+                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length + boneIndex
                         );
             else
                 return 
                     GPUSkinningUtil.GetMatrixFromTexture(
                         colorsForMatrix,
-                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length,
-                        boneIndex
+                        clips[clipIndex].matrixStartIndex + frameIndex * bones.Length + boneIndex
                         );
         }
 
-        [ContextMenu("Check Get MAtrix")]
-        public void DD()
+        private void OnEnable()
         {
-            Debug.Log(GetMatrixInTexture(1, 0, 0));
+            Array.ForEach(clips, (clip) => { clip.SetTextureForMatrix(matrixTexture, colorsForMatrix, bones.Length); });
         }
+
+        [ContextMenu("Set Matrices from TextAsset.bytes")]
+        public void SetMatrixFromTextAsset()
+        {
+            byte[] bytes = matrixTextAsset.bytes;
+            int caculateIndexOffset = 0;
+
+            for (int i = 0; i < clips.Length; i++)
+                caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
+        }
+        [ContextMenu("Set Matrices from Texture2D.GetPixels")]
+        public void SetMatrixFromTexture()
+        {
+            Color[] colors = matrixTexture.GetPixels();
+            int caculateIndexOffset = 0;
+
+            for (int i = 0; i < clips.Length; i++)
+                caculateIndexOffset += clips[i].SetMatrixFromTexture(colors, caculateIndexOffset, bones.Length);
+        }
+
     }
 }

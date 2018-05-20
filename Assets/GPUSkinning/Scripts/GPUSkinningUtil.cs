@@ -149,9 +149,9 @@
         public const int matrixColorSize = 3; // Matrix composed three Vector4
         public const int matrixPixelSize = 3; // Matrix composed three Vector4
 
-        public static Matrix4x4 GetMatrixFromTexture(byte[] matrixBytes, int startByteIndex, int matrixIndex)
+        public static Matrix4x4 GetMatrixFromTexture(byte[] matrixBytes, int matrixIndex)
         {
-            int byteIndex = startByteIndex + GPUSkinningUtil.matrixByteSize * matrixIndex;
+            int byteIndex = GPUSkinningUtil.matrixByteSize * matrixIndex;
 
             return
                 new Matrix4x4(
@@ -162,9 +162,9 @@
                     );
         }
 
-        public static Matrix4x4 GetMatrixFromTexture(Color[] matrixColors, int startColorIndex, int matrixIndex)
+        public static Matrix4x4 GetMatrixFromTexture(Color[] matrixColors, int matrixIndex)
         {
-            int colorIndex = startColorIndex + matrixIndex * GPUSkinningUtil.matrixColorSize;
+            int colorIndex = matrixIndex * GPUSkinningUtil.matrixColorSize;
             Color 
                 color0 = matrixColors[colorIndex + 0], 
                 color1 = matrixColors[colorIndex + 1], 
@@ -186,14 +186,14 @@
         /// <param name="accumPixelIndex"></param>
         /// <param name="matrixIndex"></param>
         /// <returns></returns>
-        public static Matrix4x4 GetMatrixFromTexture(Texture2D texture, int startPixelIndex, int matrixIndex)
+        public static Matrix4x4 GetMatrixFromTexture(Texture2D texture, int matrixIndex)
         {
-            int pixelIndex = startPixelIndex + matrixIndex * GPUSkinningUtil.matrixPixelSize;
+            int pixelIndex = matrixIndex * GPUSkinningUtil.matrixPixelSize;
 
             Color 
-                color0 = texture.GetPixel((pixelIndex + 0) / texture.width, (pixelIndex + 0) % texture.width), 
-                color1 = texture.GetPixel((pixelIndex + 1) / texture.width, (pixelIndex + 1) % texture.width), 
-                color2 = texture.GetPixel((pixelIndex + 2) / texture.width, (pixelIndex + 2) % texture.width);
+                color0 = texture.GetPixel((pixelIndex + 0) % texture.width, (pixelIndex + 0) / texture.width), 
+                color1 = texture.GetPixel((pixelIndex + 1) % texture.width, (pixelIndex + 1) / texture.width), 
+                color2 = texture.GetPixel((pixelIndex + 2) % texture.width, (pixelIndex + 2) / texture.width);
 
             return
                 new Matrix4x4(
