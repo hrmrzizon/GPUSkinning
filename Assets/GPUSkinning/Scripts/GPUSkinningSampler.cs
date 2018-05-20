@@ -67,6 +67,10 @@
 
         [HideInInspector]
         [SerializeField]
+        public Texture texture2 = null;
+
+        [HideInInspector]
+        [SerializeField]
         public GPUSkinningQuality skinQuality = GPUSkinningQuality.Bone2;
 
         [HideInInspector]
@@ -139,14 +143,12 @@
         {
             samplingClipIndex = 0;
             acculSamplingTotalFrams = 0;
-            Debug.Log("BeginSample");
         }
 
         public void EndSample()
         {
             samplingClipIndex = -1;
             acculSamplingTotalFrams = 0;
-            Debug.Log("EndSample");
         }
 
         public bool IsSamplingProgress()
@@ -555,6 +557,17 @@
                 fileStream.Dispose();
             }
             WriteTempData(TEMP_SAVED_TEXTURE_PATH, savedPath);
+
+            texture.filterMode = FilterMode.Point;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.anisoLevel = 0;
+
+            string savedPathTexture = string.Format("{0}/GPUSKinning_Texture2_{1}.asset", dir, animName);
+            AssetDatabase.CreateAsset(texture, savedPathTexture);
+            WriteTempData(TEMP_SAVED_TEXTURE2_PATH, savedPathTexture);
+
+            gpuSkinningAnim.matrixTexture = texture;
+            gpuSkinningAnim.matrixTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(savedPath);
         }
 
         private void CalculateTextureSize(int numPixels, out int texWidth, out int texHeight)
@@ -690,7 +703,6 @@
             if (samplingFrameIndex >= totalFrams)
             {
                 acculSamplingTotalFrams += totalFrams;
-                Debug.Log(acculSamplingTotalFrams);
 
                 if (animator != null)
                 {
