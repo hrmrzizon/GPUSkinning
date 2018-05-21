@@ -103,12 +103,6 @@
                 mtrls = null;
             }
 
-            if (texture != null)
-            {
-                Object.DestroyImmediate(texture);
-                texture = null;
-            }
-
             if (players != null)
             {
                 players.Clear();

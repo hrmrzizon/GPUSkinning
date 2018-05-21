@@ -146,8 +146,8 @@
         }
 
         public const int matrixByteSize = 3 /*rows*/ * 4 /*rowitems*/ * 1 /*bytesize*/ * 2 /*half-2byte*/;
-        public const int matrixColorSize = 3; // Matrix composed three Vector4
-        public const int matrixPixelSize = 3; // Matrix composed three Vector4
+        public const int matrixColorSize = 3; // Matrix composed three Vector4, Color substitute Vector4.
+        public const int matrixPixelSize = 3; // Matrix composed three Vector4, Color substitute Vector4.
 
         public static Matrix4x4 GetMatrixFromTexture(byte[] matrixBytes, int matrixIndex)
         {

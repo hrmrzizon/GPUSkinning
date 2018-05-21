@@ -29,12 +29,11 @@
 
         public float sphereRadius = 1.0f;
 
-        public TextAsset matrixTextAsset;
         public Texture2D matrixTexture;
         [System.NonSerialized]
         public Color[] colorsForMatrix = null;
 
-        public void LoadMatrixAsPixel() { colorsForMatrix = matrixTexture.GetPixels(); }
+        public bool preloadMatrixAsColor;
 
         public Matrix4x4 GetMatrixInTexture(int clipIndex, int frameIndex, int boneIndex)
         {
@@ -54,18 +53,14 @@
 
         private void OnEnable()
         {
-            Array.ForEach(clips, (clip) => { clip.SetTextureForMatrix(matrixTexture, colorsForMatrix, bones.Length); });
+            if (matrixTexture != null)
+                if (preloadMatrixAsColor)
+                    colorsForMatrix = matrixTexture.GetPixels();
+
+            if (clips != null)
+                Array.ForEach(clips, (clip) => { clip.SetTextureForMatrix(matrixTexture, colorsForMatrix, bones.Length); });
         }
 
-        [ContextMenu("Set Matrices from TextAsset.bytes")]
-        public void SetMatrixFromTextAsset()
-        {
-            byte[] bytes = matrixTextAsset.bytes;
-            int caculateIndexOffset = 0;
-
-            for (int i = 0; i < clips.Length; i++)
-                caculateIndexOffset += clips[i].SetMatrixFromTexture(bytes, caculateIndexOffset, bones.Length);
-        }
         [ContextMenu("Set Matrices from Texture2D.GetPixels")]
         public void SetMatrixFromTexture()
         {

@@ -8,11 +8,11 @@
     {
         private List<GPUSkinningPlayerResources> items = new List<GPUSkinningPlayerResources>();
 
-        public void Register(GPUSkinningAnimation anim, Mesh mesh, Material originalMtrl, TextAsset textureRawData, GPUSkinningPlayerMono player, out GPUSkinningPlayerResources resources)
+        public void Register(GPUSkinningAnimation anim, Mesh mesh, Material originalMtrl, Texture2D textureData, GPUSkinningPlayerMono player, out GPUSkinningPlayerResources resources)
         {
             resources = null;
 
-            if (anim == null || originalMtrl == null || textureRawData == null || player == null)
+            if (anim == null || originalMtrl == null || textureData == null || player == null)
             {
                 return;
             }
@@ -49,7 +49,7 @@
 
             if (item.texture == null)
             {
-                item.texture = GPUSkinningTexturePool.GetTextureOrAdd(textureRawData.name, () => GPUSkinningUtil.CreateTexture2D(textureRawData, anim));
+                item.texture = textureData;
             }
 
             if (!item.players.Contains(player))

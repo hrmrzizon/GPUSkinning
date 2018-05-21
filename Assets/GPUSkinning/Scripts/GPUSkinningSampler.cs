@@ -63,11 +63,7 @@
 
         [HideInInspector]
         [SerializeField]
-        public TextAsset texture = null;
-
-        [HideInInspector]
-        [SerializeField]
-        public Texture texture2 = null;
+        public Texture2D texture = null;
 
         [HideInInspector]
         [SerializeField]
@@ -132,12 +128,15 @@
         [System.NonSerialized]
         public int samplingFrameIndex = 0;
 
+        [HideInInspector]
+        [System.NonSerialized]
+        public Texture2D matrixBuffer;
+
         public const string TEMP_SAVED_ANIM_PATH = "GPUSkinning_Temp_Save_Anim_Path";
         public const string TEMP_SAVED_MTRL_PATH = "GPUSkinning_Temp_Save_Mtrl_Path";
         public const string TEMP_SAVED_MESH_PATH = "GPUSkinning_Temp_Save_Mesh_Path";
         public const string TEMP_SAVED_SHADER_PATH = "GPUSkinning_Temp_Save_Shader_Path";
         public const string TEMP_SAVED_TEXTURE_PATH = "GPUSkinning_Temp_Save_Texture_Path";
-        public const string TEMP_SAVED_TEXTURE2_PATH = "GPUSkinning_Temp_Save_Texture2_Path";
 
         public void BeginSample()
         {
@@ -359,16 +358,30 @@
             {
                 AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController();
                 AnimationClip[] clips = runtimeAnimatorController.animationClips;
+
+#if UNITY_2017_NEWER || UNITY_2017
+                List<KeyValuePair<AnimationClip, AnimationClip>> overrideClips = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+#else
                 AnimationClipPair[] pairs = new AnimationClipPair[clips.Length];
+#endif
                 for (int i = 0; i < clips.Length; ++i)
                 {
+#if UNITY_2017_NEWER || UNITY_2017
+                    overrideClips.Add(new KeyValuePair<AnimationClip, AnimationClip>(clips[i], animClip));
+#else
                     AnimationClipPair pair = new AnimationClipPair();
                     pairs[i] = pair;
                     pair.originalClip = clips[i];
                     pair.overrideClip = animClip;
+#endif
                 }
+#if UNITY_2017_NEWER || UNITY_2017
                 animatorOverrideController.runtimeAnimatorController = runtimeAnimatorController;
+#else
                 animatorOverrideController.clips = pairs;
+#endif
+                animatorOverrideController.ApplyOverrides(overrideClips);
+
                 animator.runtimeAnimatorController = animatorOverrideController;
             }
         }
@@ -547,27 +560,15 @@
             texture.SetPixels(pixels);
             texture.Apply();
 
-            string savedPath = string.Format("{0}/GPUSKinning_Texture_{1}.bytes", dir, animName);
-            using (FileStream fileStream = new FileStream(savedPath, FileMode.Create))
-            {
-                byte[] bytes = texture.GetRawTextureData();
-                fileStream.Write(bytes, 0, bytes.Length);
-                fileStream.Flush();
-                fileStream.Close();
-                fileStream.Dispose();
-            }
-            WriteTempData(TEMP_SAVED_TEXTURE_PATH, savedPath);
-
             texture.filterMode = FilterMode.Point;
             texture.wrapMode = TextureWrapMode.Clamp;
             texture.anisoLevel = 0;
 
-            string savedPathTexture = string.Format("{0}/GPUSKinning_Texture2_{1}.asset", dir, animName);
-            AssetDatabase.CreateAsset(texture, savedPathTexture);
-            WriteTempData(TEMP_SAVED_TEXTURE2_PATH, savedPathTexture);
+            string textureSavedPath = string.Format("{0}/GPUSKinning_Texture_{1}.asset", dir, animName);
+            AssetDatabase.CreateAsset(texture, textureSavedPath);
+            WriteTempData(TEMP_SAVED_TEXTURE_PATH, textureSavedPath);
 
             gpuSkinningAnim.matrixTexture = texture;
-            gpuSkinningAnim.matrixTextAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(savedPath);
         }
 
         private void CalculateTextureSize(int numPixels, out int texWidth, out int texHeight)
@@ -958,5 +959,5 @@
             PlayerPrefs.DeleteKey(key);
         }
 #endif
-    }
-}
+            }
+            }

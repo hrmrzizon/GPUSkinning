@@ -7,7 +7,7 @@
     [System.Serializable]
     public class GPUSkinningFrame
     {
-        [System.NonSerialized]
+        //[System.NonSerialized]
         public Matrix4x4[] matrices = null;
 
         public Quaternion rootMotionDeltaPositionQ;
@@ -24,7 +24,7 @@
         {
             if (!rootMotionInvInit)
             {
-                if (matrices == null)
+                if (matrixTexture != null || colorsForMatrix != null)
                 {
                     rootMotionInv = GetMatrixInTexture(rootBoneIndex).inverse;
                     rootMotionInvInit = true;
