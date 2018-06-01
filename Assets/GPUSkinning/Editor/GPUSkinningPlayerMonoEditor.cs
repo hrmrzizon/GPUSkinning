@@ -48,7 +48,7 @@
             }
 
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("textureRawData"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("textureData"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();

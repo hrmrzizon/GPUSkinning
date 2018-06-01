@@ -17,7 +17,7 @@
 
         private Material mtrl = null;
 
-        private TextAsset texture = null;
+        private Texture2D texture = null;
 
         private RenderTexture rt = null;
 
@@ -144,7 +144,7 @@
                     GUI.enabled = true && guiEnabled;
 
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("skinQuality"), qualityContent);
-
+                     
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("shaderType"), shaderTypeContent);
 
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("rootBoneTransform"), rootBoneContent);

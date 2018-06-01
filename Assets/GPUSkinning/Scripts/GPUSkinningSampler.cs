@@ -130,7 +130,11 @@
 
         [HideInInspector]
         [System.NonSerialized]
-        public Texture2D matrixBuffer;
+        public Texture2D matrixTextureBuffer;
+
+        [HideInInspector]
+        [System.NonSerialized]
+        public int prevMatrixTextureHeight = 0;
 
         public const string TEMP_SAVED_ANIM_PATH = "GPUSkinning_Temp_Save_Anim_Path";
         public const string TEMP_SAVED_MTRL_PATH = "GPUSkinning_Temp_Save_Mtrl_Path";
@@ -237,6 +241,7 @@
             gpuSkinningAnimation.bones = newBones;
             gpuSkinningAnimation.rootBoneIndex = 0;
 
+
             int numClips = gpuSkinningAnimation.clips == null ? 0 : gpuSkinningAnimation.clips.Length;
             int overrideClipIndex = -1;
             for (int i = 0; i < numClips; ++i)
@@ -284,6 +289,39 @@
             PrepareRecordAnimator();
 
             isSampling = true;
+
+            string textureSavedPath = ReadTempData(TEMP_SAVED_TEXTURE_PATH);
+            matrixTextureBuffer = AssetDatabase.LoadAssetAtPath<Texture2D>(textureSavedPath);
+
+            int width = gpuSkinningAnimation.bones.Length * 3 /* * Color */, height = numFrames;
+
+            if (matrixTextureBuffer != null && samplingClipIndex != 0)
+            {
+                prevMatrixTextureHeight = matrixTextureBuffer.height;
+                height += matrixTextureBuffer.height;
+            }
+
+            if (matrixTextureBuffer == null)
+            {
+                matrixTextureBuffer = new Texture2D(width, height, TextureFormat.RGBAHalf, false, true);
+
+                matrixTextureBuffer.filterMode = FilterMode.Point;
+                matrixTextureBuffer.wrapMode = TextureWrapMode.Clamp;
+                matrixTextureBuffer.anisoLevel = 0;
+            }
+            else
+            {
+                Texture2D newBuffer = new Texture2D(width, height, TextureFormat.RGBAHalf, false, true);
+
+                newBuffer.filterMode = FilterMode.Point;
+                newBuffer.wrapMode = TextureWrapMode.Clamp;
+                newBuffer.anisoLevel = 0;
+
+                Graphics.CopyTexture(matrixTextureBuffer, 0, 0, 0, 0, width, matrixTextureBuffer.height, newBuffer, 0, 0, 0, 0);
+
+                Texture2D.DestroyImmediate(matrixTextureBuffer, true);
+                matrixTextureBuffer = newBuffer;
+            }
         }
 
         private int GetClipFPS(AnimationClip clip, int clipIndex)
@@ -535,40 +573,40 @@
 
         private void CreateTextureMatrix(string dir, GPUSkinningAnimation gpuSkinningAnim)
         {
-            Texture2D texture = new Texture2D(gpuSkinningAnim.textureWidth, gpuSkinningAnim.textureHeight, TextureFormat.RGBAHalf, false, true);
-            Color[] pixels = texture.GetPixels();
-            int pixelIndex = 0;
-            for (int clipIndex = 0; clipIndex < gpuSkinningAnim.clips.Length; ++clipIndex)
-            {
-                GPUSkinningClip clip = gpuSkinningAnim.clips[clipIndex];
-                GPUSkinningFrame[] frames = clip.frames;
-                int numFrames = frames.Length;
-                for (int frameIndex = 0; frameIndex < numFrames; ++frameIndex)
-                {
-                    GPUSkinningFrame frame = frames[frameIndex];
-                    Matrix4x4[] matrices = frame.matrices;
-                    int numMatrices = matrices.Length;
-                    for (int matrixIndex = 0; matrixIndex < numMatrices; ++matrixIndex)
-                    {
-                        Matrix4x4 matrix = matrices[matrixIndex];
-                        pixels[pixelIndex++] = new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03);
-                        pixels[pixelIndex++] = new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13);
-                        pixels[pixelIndex++] = new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23);
-                    }
-                }
-            }
-            texture.SetPixels(pixels);
-            texture.Apply();
+            //Texture2D texture = new Texture2D(gpuSkinningAnim.textureWidth, gpuSkinningAnim.textureHeight, TextureFormat.RGBAHalf, false, true);
+            //Color[] pixels = texture.GetPixels();
+            //int pixelIndex = 0;
+            //for (int clipIndex = 0; clipIndex < gpuSkinningAnim.clips.Length; ++clipIndex)
+            //{
+            //    GPUSkinningClip clip = gpuSkinningAnim.clips[clipIndex];
+            //    GPUSkinningFrame[] frames = clip.frames;
+            //    int numFrames = frames.Length;
+            //    for (int frameIndex = 0; frameIndex < numFrames; ++frameIndex)
+            //    {
+            //        GPUSkinningFrame frame = frames[frameIndex];
+            //        Matrix4x4[] matrices = frame.matrices;
+            //        int numMatrices = matrices.Length;
+            //        for (int matrixIndex = 0; matrixIndex < numMatrices; ++matrixIndex)
+            //        {
+            //            Matrix4x4 matrix = matrices[matrixIndex];
+            //            pixels[pixelIndex++] = new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03);
+            //            pixels[pixelIndex++] = new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13);
+            //            pixels[pixelIndex++] = new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23);
+            //        }
+            //    }
+            //}
+            //texture.SetPixels(pixels);
+            //texture.Apply();
 
-            texture.filterMode = FilterMode.Point;
-            texture.wrapMode = TextureWrapMode.Clamp;
-            texture.anisoLevel = 0;
+            //texture.filterMode = FilterMode.Point;
+            //texture.wrapMode = TextureWrapMode.Clamp;
+            //texture.anisoLevel = 0;
 
             string textureSavedPath = string.Format("{0}/GPUSKinning_Texture_{1}.asset", dir, animName);
-            AssetDatabase.CreateAsset(texture, textureSavedPath);
+            AssetDatabase.CreateAsset(matrixTextureBuffer, textureSavedPath);
             WriteTempData(TEMP_SAVED_TEXTURE_PATH, textureSavedPath);
 
-            gpuSkinningAnim.matrixTexture = texture;
+            gpuSkinningAnim.matrixTexture = matrixTextureBuffer;
         }
 
         private void CalculateTextureSize(int numPixels, out int texWidth, out int texHeight)
@@ -803,11 +841,12 @@
             {
                 Transform boneTransform = bones[i].transform;
                 GPUSkinningBone currentBone = GetBoneByTransform(boneTransform);
-                frame.matrices[i] = currentBone.bindpose;
+                Matrix4x4 matrix = currentBone.bindpose;
+
                 do
                 {
                     Matrix4x4 mat = Matrix4x4.TRS(currentBone.transform.localPosition, currentBone.transform.localRotation, currentBone.transform.localScale);
-                    frame.matrices[i] = mat * frame.matrices[i];
+                    matrix = mat * matrix;
                     if (currentBone.parentBoneIndex == -1)
                     {
                         break;
@@ -818,6 +857,12 @@
                     }
                 }
                 while (true);
+
+                frame.matrices[i] = matrix;
+
+                matrixTextureBuffer.SetPixel(i * 3 + 0, samplingFrameIndex + prevMatrixTextureHeight, new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03));
+                matrixTextureBuffer.SetPixel(i * 3 + 1, samplingFrameIndex + prevMatrixTextureHeight, new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13));
+                matrixTextureBuffer.SetPixel(i * 3 + 2, samplingFrameIndex + prevMatrixTextureHeight, new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23));
             }
 
             if (samplingFrameIndex == 0)
